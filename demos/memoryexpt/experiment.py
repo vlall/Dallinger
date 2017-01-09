@@ -24,7 +24,7 @@ class CoordinationChatroom(dlgr.experiments.Experiment):
         # (also in config.txt, change to n = whatever)
         self.experiment_repeats = 1
         self.num_participants = dlgr.config.experiment_configuration.n
-        self.initial_recruitment_size = self.num_participants*2 #recruit more people than are needed for expt
+        self.initial_recruitment_size = self.num_participants*3 #self.num_participants*2 #recruit more people than are needed for expt
         self.quorum = self.num_participants
         self.setup()
 
@@ -52,6 +52,15 @@ class CoordinationChatroom(dlgr.experiments.Experiment):
             dlgr.config.experiment_configuration.network
         )
         return class_(max_size=self.num_participants + 1)  # add a Source
+
+    def bonus(self, participant):
+        """Give the participant a bonus for waiting."""
+
+        DOLLARS_PER_HOUR = 5.0
+        t = participant.end_time - participant.creation_time
+
+        # keep to two decimal points otherwise doesn't work
+        return round(t.total_seconds()/3600 * DOLLARS_PER_HOUR, 2)
 
     def add_node_to_network(self, node, network):
         """Add node to the chain and receive transmissions."""
