@@ -1,8 +1,8 @@
 [Experiment Configuration]
 mode = deploy
 auto_recruit = true
-network = FullyConnected
-n = 1
+network = babyNetwork
+n = 4
 
 [HIT Configuration]
 title = Memory test
@@ -36,4 +36,3 @@ logfile = -
 
 [Shell Parameters]
 launch_in_sandbox_mode = false
-

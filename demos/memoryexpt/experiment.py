@@ -14,19 +14,19 @@ class CoordinationChatroom(dlgr.experiments.Experiment):
         super(CoordinationChatroom, self).__init__(session)
         # for running an experiment with individuals three times
         # (also in config.txt, change to n = 1)
-        self.experiment_repeats = 4 #1
-        self.num_participants = dlgr.config.experiment_configuration.n
-        self.initial_recruitment_size = self.experiment_repeats #self.num_participants*2 #recruit more people than are needed for expt
-        self.quorum = self.num_participants
-        self.setup()
+        #self.experiment_repeats = 4 #1
+        #self.num_participants = dlgr.config.experiment_configuration.n
+        #self.initial_recruitment_size = self.experiment_repeats #self.num_participants*2 #recruit more people than are needed for expt
+        #self.quorum = self.num_participants
+        #self.setup()
 
         # for normal experiment
         # (also in config.txt, change to n = whatever)
-        #self.experiment_repeats = 1
-        #self.num_participants = dlgr.config.experiment_configuration.n
-        #self.initial_recruitment_size = self.num_participants*3 #self.num_participants*2 #recruit more people than are needed for expt
-        #self.quorum = self.num_participants
-        #self.setup()
+        self.experiment_repeats = 1
+        self.num_participants = dlgr.config.experiment_configuration.n
+        self.initial_recruitment_size = self.num_participants*3 #self.num_participants*2 #recruit more people than are needed for expt
+        self.quorum = self.num_participants
+        self.setup()
 
     def recruit(self):
         """Recruit one participant at a time until all networks are full."""
@@ -70,16 +70,19 @@ class CoordinationChatroom(dlgr.experiments.Experiment):
         source.transmit(to_whom=node)  # in networks.py code, transmit info to the new node
         node.receive()  # new node receives everything
 
-    def info_post_request(self, node, info):
-        """Run when a request to create an info is complete."""
-        for agent in node.neighbors():
-            node.transmit(what=info, to_whom=agent)
-
     #def info_post_request(self, node, info):
     #    """Run when a request to create an info is complete."""
     #    """Transfer info to only one neighbor."""
     #    agent = random.choice(node.neighbors()):
     #    node.transmit(what=info, to_whom=agent)
+    #    for agent in node.neighbors():
+    #        node.transmit(what=info, to_whom=agent)
+
+    def info_post_request(self, node, info):
+        """Run when a request to create an info is complete."""
+        """Transfer info to only one neighbor."""
+        agent = random.choice(node.neighbors())
+        node.transmit(what=info, to_whom=agent)
 
     def create_node(self, participant, network):
         """Create a node for a participant."""
