@@ -42,6 +42,20 @@ class FullyConnected(Network):
             else:
                 node.connect(direction="both", whom=n)
 
+class Empty(Network):
+    """An empty network with no vectors."""
+
+    __mapper_args__ = {"polymorphic_identity": "empty"}
+
+    def add_node(self, node):
+        """Do nothing."""
+        pass
+
+    def add_source(self, source):
+        """Connect the source to all existing other nodes."""
+        nodes = [n for n in self.nodes() if not isinstance(n, Source)]
+        source.connect(whom=nodes)
+
 class babyNetwork(Network):
     """Just for practice, will be deleted later
         """
@@ -52,15 +66,20 @@ class babyNetwork(Network):
         """Manually connect up a network."""
 
         # here are all the edges that need to be connected
-        all_edges = [(0, 1), (2, 3)]
+        all_edges = [(0, 1), (0, 2), (0, 3), (2, 3)]
 
         # walk through edges
         for edge in all_edges:
-            if node.id == max(edge):
+            if node.id-2 == max(edge): # wait until you can connect backwards
                 connect_to_node = Node.query.filter_by(id=min(edge)+2).one()
-                node.connect(direction="from", whom=connect_to_node)
-                print('Error: there is no node {}'.format(min(edge)+2))
-                print('Error: there is edge {}'.format(edge))
+                node.connect(direction="from", whom=connect_to_node) # connect backward
+                connect_to_node.connect(direction="from", whom=node) # connect forward
+
+    def add_source(self, source):
+        """Connect the source to all existing other nodes."""
+        nodes = [n for n in self.nodes() if not isinstance(n, Source)]
+        source.connect(whom=nodes)
+
 
 class KarateClub(Network):
     """KarateClub network.
@@ -98,9 +117,16 @@ class KarateClub(Network):
 
         # walk through edges
         for edge in all_edges:
-            if node.id == max(edge):
+            if node.id-2 == max(edge): # wait until you can connect backwards
                 connect_to_node = Node.query.filter_by(id=min(edge)+2).one()
-                node.connect(direction="from", whom=connect_to_node)
+                node.connect(direction="from", whom=connect_to_node) # connect backward
+                connect_to_node.connect(direction="from", whom=node) # connect forward
+
+    def add_source(self, source):
+        """Connect the source to all existing other nodes."""
+        nodes = [n for n in self.nodes() if not isinstance(n, Source)]
+        source.connect(whom=nodes)
+
 
 class SmallWorld(Network):
     """Small-world network.
@@ -127,25 +153,15 @@ class SmallWorld(Network):
 
         # walk through edges
         for edge in all_edges:
-            if node.id == max(edge):
+            if node.id-2 == max(edge): # wait until you can connect backwards
                 connect_to_node = Node.query.filter_by(id=min(edge)+2).one()
-                node.connect(direction="from", whom=connect_to_node)
-
-
-class Empty(Network):
-    """An empty network with no vectors."""
-
-    __mapper_args__ = {"polymorphic_identity": "empty"}
-
-    def add_node(self, node):
-        """Do nothing."""
-        pass
+                node.connect(direction="from", whom=connect_to_node) # connect backward
+                connect_to_node.connect(direction="from", whom=node) # connect forward
 
     def add_source(self, source):
         """Connect the source to all existing other nodes."""
         nodes = [n for n in self.nodes() if not isinstance(n, Source)]
         source.connect(whom=nodes)
-
 
 class Star(Network):
     """A star network.

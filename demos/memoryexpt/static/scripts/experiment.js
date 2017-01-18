@@ -291,6 +291,7 @@ waitForQuorum = function () {
             percent = Math.round((n/quorum)*100.0) + "%";
             $("#waiting-progress-bar").css("width", percent);
             $("#progress-percentage").text(percent);
+            //if (1==1) {
             if (n >= quorum) {
                 function doSetTimeout(i) {
                     setTimeout(function(){

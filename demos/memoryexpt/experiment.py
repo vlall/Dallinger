@@ -53,14 +53,14 @@ class CoordinationChatroom(dlgr.experiments.Experiment):
         )
         return class_(max_size=self.num_participants + 1)  # add a Source
 
-    #def bonus(self, participant):
-    #    """Give the participant a bonus for waiting."""
-    #
-    #    DOLLARS_PER_HOUR = 5.0
-    #    t = participant.end_time - participant.creation_time
-    #
-    #    # keep to two decimal points otherwise doesn't work
-    #    return round(t.total_seconds()/3600 * DOLLARS_PER_HOUR, 2)
+    def bonus(self, participant):
+        """Give the participant a bonus for waiting."""
+
+        DOLLARS_PER_HOUR = 5.0
+        t = participant.end_time - participant.creation_time
+
+        # keep to two decimal points otherwise doesn't work
+        return round(t.total_seconds()/3600 * DOLLARS_PER_HOUR, 2)
 
     def add_node_to_network(self, node, network):
         """Add node to the chain and receive transmissions."""
@@ -72,9 +72,6 @@ class CoordinationChatroom(dlgr.experiments.Experiment):
 
     #def info_post_request(self, node, info):
     #    """Run when a request to create an info is complete."""
-    #    """Transfer info to only one neighbor."""
-    #    agent = random.choice(node.neighbors()):
-    #    node.transmit(what=info, to_whom=agent)
     #    for agent in node.neighbors():
     #        node.transmit(what=info, to_whom=agent)
 
