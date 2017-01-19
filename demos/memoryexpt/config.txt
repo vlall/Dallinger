@@ -1,8 +1,8 @@
 [Experiment Configuration]
 mode = deploy
 auto_recruit = true
-network = babyNetwork
-n = 5
+network = Empty
+n = 34
 
 [HIT Configuration]
 title = Memory test
