@@ -14,11 +14,7 @@
         <div class="main_div">
 
             <div id="stimulus">
-                <!--<div><blockquote id="wordlist"><p>&lt;&lt; loading &gt;&gt;</p></blockquote></div>!-->
                 <div><h1 id="wordlist"></h1></div>
-                <br>
-                <br>
-                <button id="finish-reading" type="button" class="btn btn-primary" onClick="finish_reading();">Go to chatroom</button>
             </div>
 
             <div id="fillertask-form" style="display:none;">
@@ -77,8 +73,8 @@
                 <button id="leave-chat" type="button" class="btn" onClick="leave_chatroom();">I can't recall any more</button>
             </div>
         </div>
+        <script>
+            create_agent();
+        </script>
     </body>
-    <script>
-        create_agent();
-    </script>
 </html>

@@ -3,7 +3,6 @@ var uniqueWords= [];
 $(document).ready(function() {
     // Print the consent form.
     $("#print-consent").click(function() {
-        console.log("hello");
         window.print();
     });
 
@@ -30,19 +29,19 @@ $(document).ready(function() {
         window.location.href = '/waiting';
     });
 
-    $("#finish-reading").hide();
-
-    // Finish reading the wordlist
-    $("#finish-reading").click(function() {
-        // move to chatroom
-        $("#stimulus").hide();
-        $("#fillertask-form").hide();
-        $("#response-form").show();
-        $("#send-message").removeClass("disabled");
-        $("#send-message").html("Send");
-        $("#reproduction").focus();
-        get_transmissions(my_node_id);
-    });
+    // $("#finish-reading").hide();
+    //
+    // // Finish reading the wordList
+    // $("#finish-reading").click(function() {
+    //     // move to chatroom
+    //     $("#stimulus").hide();
+    //     $("#fillertask-form").hide();
+    //     $("#response-form").show();
+    //     $("#send-message").removeClass("disabled");
+    //     $("#send-message").html("Send");
+    //     $("#reproduction").focus();
+    //     get_transmissions(my_node_id);
+    // });
 
     // Send a message.
     $("#send-message").click(function() {
@@ -69,9 +68,8 @@ create_agent = function () {
         type: "json",
         success: function (resp) {
             my_node_id = resp.node.id;
-
-            // display wordlist
-            get_info(my_node_id);
+            // display wordList
+            getWordList(my_node_id);
         },
         error: function (err) {
             console.log(err);
@@ -86,56 +84,15 @@ create_agent = function () {
     });
 };
 
-get_info = function() {
+getWordList = function() {
 
     reqwest({
         url: "/node/" + my_node_id + "/received_infos",
         method: "get",
         type: "json",
         success: function (resp) {
-
-
-            var wordlist = JSON.parse(resp.infos[0].contents);
-            //wordlistHTML = markdown.toHTML(wordlist);
-
-            // write a word every 2 seconds
-            function doSetTimeout(i) {
-                setTimeout(function(){
-
-                    if (i==-1){
-                      // do nothing
-                    }
-
-                    if (i>=0 && i<wordlist.length){
-                      // display words
-                      $("#wordlist").html(wordlist[i]);
-                    }
-
-                     // show filler task
-                     if (i==wordlist.length){
-                       $("#stimulus").hide();
-                       $("#fillertask-form").show();
-                       //$("#finish-reading").show();
-                     }
-
-                     // go to chatroom
-                     if (i==wordlist.length+30/2){
-                      $("#fillertask-form").hide();
-                      submitResponses();
-                      $("#response-form").show();
-                      $("#send-message").removeClass("disabled");
-                      $("#send-message").html("Send");
-                      $("#reproduction").focus();
-                      get_transmissions(my_node_id);
-                      }
-
-
-                 }, (i+1)*2000);
-            }
-
-            for (i = -1; i < wordlist.length+30/2+1; i++){
-                doSetTimeout(i);
-            }
+            var wordList = JSON.parse(resp.infos[0].contents);
+            showWordList(wordList);
         },
         error: function (err) {
             console.log(err);
@@ -143,6 +100,38 @@ get_info = function() {
             $('body').html(errorResponse.html);
         }
     });
+};
+
+showWordList = function (wl) {
+    if (wl.length === 0){ // Show filler task.
+        showFillerTask();
+
+    } else { // Show the word.
+        $("#wordlist").html(wl.pop());
+        setTimeout(function () {
+            showWordList(wl);
+        }, 2000);
+    }
+};
+
+showFillerTask = function () {
+
+    $("#stimulus").hide();
+    $("#fillertask-form").show();
+
+    setTimeout(function(){
+        showExperiment();
+    }, 30000);
+};
+
+showExperiment = function () {
+    $("#fillertask-form").hide();
+    submitResponses();
+    $("#response-form").show();
+    $("#send-message").removeClass("disabled");
+    $("#send-message").html("Send");
+    $("#reproduction").focus();
+    get_transmissions(my_node_id);
 };
 
 get_transmissions = function (my_node_id) {
@@ -235,7 +224,6 @@ send_message = function() {
             info_type: "Info",
         },
         success: function (resp) {
-            console.log("sent!");
             $("#send-message").removeClass("disabled");
             $("#send-message").html("Send");
         }
@@ -249,7 +237,6 @@ leave_chatroom = function() {
 
 $(document).keypress(function (e) {
   if (e.which == 13) {
-    console.log("enter!");
     $("#send-message").click();
     return false;
   }
@@ -261,7 +248,6 @@ killIfAnyInfos = function () {
       url: "/info",
       method: "get",
       success: function (resp) {
-        console.log(resp);
         if (resp.info.count > 0) {
           allow_exit();
           go_to_page("questionnaire");
