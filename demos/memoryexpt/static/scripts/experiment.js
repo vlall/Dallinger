@@ -1,6 +1,8 @@
-var uniqueWords= [];
+var uniqueWords = [];
+var currentNodeId;
 
 $(document).ready(function() {
+
     // Print the consent form.
     $("#print-consent").click(function() {
         window.print();
@@ -17,7 +19,7 @@ $(document).ready(function() {
         window.location.href = '/instructions/instructions-1';
     });
 
-    // Consent to the experiment.
+    // Do not consent to the experiment.
     $("#no-consent").click(function() {
         allow_exit();
         self.close();
@@ -53,9 +55,8 @@ create_agent = function () {
         method: "post",
         type: "json",
         success: function (resp) {
-            my_node_id = resp.node.id;
-            // display wordList
-            getWordList(my_node_id);
+            currentNodeId = resp.node.id;
+            getWordList();
         },
         error: function (err) {
             console.log(err);
@@ -70,10 +71,10 @@ create_agent = function () {
     });
 };
 
-getWordList = function() {
+getWordList = function () {
 
     reqwest({
-        url: "/node/" + my_node_id + "/received_infos",
+        url: "/node/" + currentNodeId + "/received_infos",
         method: "get",
         type: "json",
         success: function (resp) {
@@ -117,12 +118,12 @@ showExperiment = function () {
     $("#send-message").removeClass("disabled");
     $("#send-message").html("Send");
     $("#reproduction").focus();
-    get_transmissions(my_node_id);
+    get_transmissions();
 };
 
-get_transmissions = function (my_node_id) {
+get_transmissions = function () {
     reqwest({
-        url: "/node/" + my_node_id + "/transmissions",
+        url: "/node/" + currentNodeId + "/transmissions",
         method: "get",
         type: "json",
         data: {
@@ -144,7 +145,7 @@ get_transmissions = function (my_node_id) {
         },
         complete: function (err) {
             setTimeout(function(){
-                get_transmissions(my_node_id);
+                get_transmissions(nodeId);
             }, 1000);
         }
     });
@@ -152,7 +153,7 @@ get_transmissions = function (my_node_id) {
 
 display_info = function(info_id) {
     reqwest({
-        url: "/info/" + my_node_id + "/" + info_id,
+        url: "/info/" + currentNodeId + "/" + info_id,
         method: "get",
         type: "json",
         success: function (resp) {
@@ -171,10 +172,7 @@ display_info = function(info_id) {
     });
 };
 
-send_message = function() {
-    //$("#send-message").addClass("disabled");
-    //$("#send-message").html("Sending...");
-
+send_message = function () {
     response = $("#reproduction").val(); //typing box
 
       // don't let people submit an empty response
@@ -203,7 +201,7 @@ send_message = function() {
     $("#reproduction").focus();
 
     reqwest({
-        url: "/info/" + my_node_id,
+        url: "/info/" + currentNodeId,
         method: "post",
         data: {
             contents: response,
