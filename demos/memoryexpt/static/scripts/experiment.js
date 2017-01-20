@@ -255,17 +255,6 @@ $(document).keypress(function (e) {
   }
 });
 
-quorum = 1e6;
-getQuorum = function () {
-    reqwest({
-        url: "/experiment/quorum",
-        method: "get",
-        success: function (resp) {
-            quorum = resp.quorum;
-        }
-    });
-};
-
 // Send participants to the end if there are any infos.
 killIfAnyInfos = function () {
     reqwest({
@@ -281,42 +270,46 @@ killIfAnyInfos = function () {
     });
 };
 
-waitForQuorum = function () {
+quorum = 1e6;
+getQuorum = function () {
     reqwest({
-        url: "/summary",
+        url: "/experiment/quorum",
         method: "get",
         success: function (resp) {
-            summary = resp.summary;
-            n = numReady(resp.summary);
-            percent = Math.round((n/quorum)*100.0) + "%";
-            $("#waiting-progress-bar").css("width", percent);
-            $("#progress-percentage").text(percent);
-            //if (1==1) {
-            if (n >= quorum) {
-                function doSetTimeout(i) {
-                    setTimeout(function(){
-
-                        if (i > -1){
-                          $("#wordlist").html(wordlist[i]);
-                        }
-
-                        // show finish-reading button when done
-                        if (i == wordlist.length-1){
-                          $("#finish-reading").show();
-                        }
-
-                    }, (i+1)*2000);
-                }
-                allow_exit();
-                go_to_page("exp");
-            }
-        },
-        complete: function (resp) {
-            setTimeout(function(){
-                waitForQuorum();
-            }, 1000);
+            quorum = resp.quorum;
         }
     });
+};
+
+waitForQuorum = function () {
+
+    // If we haven't gotten the quorum yet, get it.
+    if (quorum >= (1e6-1)) {
+        getQuorum();
+
+    // Otherwise, see if we have enough participants to proceed.
+    } else {
+        reqwest({
+            url: "/summary",
+            method: "get",
+            success: function (resp) {
+                summary = resp.summary;
+                n = numReady(resp.summary);
+                percent = Math.round((n/quorum)*100.0) + "%";
+                $("#waiting-progress-bar").css("width", percent);
+                $("#progress-percentage").text(percent);
+
+                if (n >= quorum) {
+                    allow_exit();
+                    go_to_page("exp");
+                }
+            },
+        });
+    }
+
+    setTimeout(function(){
+        waitForQuorum();
+    }, 1000);
 };
 
 numReady = function(summary) {
