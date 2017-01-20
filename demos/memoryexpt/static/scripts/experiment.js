@@ -227,15 +227,26 @@ $(document).keypress(function (e) {
 });
 
 // Send participants to the end if there are any infos.
-killIfAnyInfos = function () {
+createParticipant = function ( ) {
+    if (numTriesLeft === 0) {
+        allow_exit();
+        go_to_page("questionnaire");
+    }
     reqwest({
       url: "/info",
       method: "get",
       success: function (resp) {
         if (resp.info.count > 0) {
-          allow_exit();
-          go_to_page("questionnaire");
+            allow_exit();
+            go_to_page("questionnaire");
+        } else {
+            create_participant();
         }
+      },
+      error: function (resp) {
+          setTimeout(function(){
+              killIfAnyInfos();
+          }, 1000);
       }
     });
 };
