@@ -93,7 +93,7 @@ showWordList = function (wl) {
     if (wl.length === 0){ // Show filler task.
         showFillerTask();
 
-    } else { // Show the word.
+    } else { // Show the next word.
         $("#wordlist").html(wl.pop());
         setTimeout(function () {
             showWordList(wl);
@@ -130,18 +130,10 @@ get_transmissions = function () {
             status: "pending",
         },
         success: function (resp) {
-
           transmissions = resp.transmissions;
           for (var i = transmissions.length - 1; i >= 0; i--) {
-
-            display_info(transmissions[i].info_id);
-
-            }
-        },
-        error: function (err) {
-            console.log(err);
-            // errorResponse = JSON.parse(err.response);
-            // $("body").html(errorResponse.html);
+            displayInfo(transmissions[i].info_id);
+          }
         },
         complete: function (err) {
             setTimeout(function(){
@@ -151,33 +143,29 @@ get_transmissions = function () {
     });
 };
 
-display_info = function(info_id) {
+displayInfo = function(infoId) {
     reqwest({
-        url: "/info/" + currentNodeId + "/" + info_id,
+        url: "/info/" + currentNodeId + "/" + infoId,
         method: "get",
         type: "json",
         success: function (resp) {
             var word = resp.info.contents.toLowerCase();
             // if word hasn't appeared before, load into unique array and display
-            if (uniqueWords.indexOf(word)=== -1){
+            if (uniqueWords.indexOf(word) === -1){
               uniqueWords.push(word);
               $("#reply").append("<p>" + word + "</p>");
             }
         },
-        error: function (err) {
-            console.log(err);
-            errorResponse = JSON.parse(err.response);
-            $("body").html(errorResponse.html);
-        }
     });
 };
 
 send_message = function () {
-    response = $("#reproduction").val(); //typing box
+
+      response = $("#reproduction").val(); // typing box
 
       // don't let people submit an empty response
       if (response.length === 0){
-      return;
+        return;
       }
 
       // let people submit only if word doesn't have a space
@@ -227,11 +215,7 @@ $(document).keypress(function (e) {
 });
 
 // Send participants to the end if there are any infos.
-createParticipant = function ( ) {
-    if (numTriesLeft === 0) {
-        allow_exit();
-        go_to_page("questionnaire");
-    }
+createParticipant = function () {
     reqwest({
       url: "/info",
       method: "get",
@@ -245,7 +229,7 @@ createParticipant = function ( ) {
       },
       error: function (resp) {
           setTimeout(function(){
-              killIfAnyInfos();
+              createParticipant();
           }, 1000);
       }
     });
@@ -293,12 +277,12 @@ waitForQuorum = function () {
         });
     }
 
-    setTimeout(function(){
+    setTimeout(function () {
         waitForQuorum();
     }, 1000);
 };
 
-numReady = function(summary) {
+numReady = function (summary) {
     for (var i = 0; i < summary.length; i++) {
         if (summary[i][0] == "working") {
             return summary[i][1];
