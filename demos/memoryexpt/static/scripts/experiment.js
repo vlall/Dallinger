@@ -297,3 +297,23 @@ numReady = function(summary) {
 submitResponses = function() {
   submitNextResponse(0);
 };
+
+// Go back to psiTurk.
+submitAssignment = function() {
+  reqwest({
+    url: "/ad_address/" + store.get("mode") + "/" + store.get("hit_id"),
+    method: "get",
+    type: "json",
+    success: function(resp) {
+      allow_exit();
+      window.location = resp.address + "?uniqueId=" + store.get("worker_id") +
+        ":" +
+        store.get("assignment_id");
+    },
+    error: function(err) {
+      console.log(err);
+      errorResponse = JSON.parse(err.response);
+      $("body").html(errorResponse.html);
+    }
+  });
+};

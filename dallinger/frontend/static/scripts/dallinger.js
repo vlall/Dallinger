@@ -17,7 +17,7 @@ hit_id = getUrlParameter("hit_id");
 worker_id = getUrlParameter("worker_id");
 assignment_id = getUrlParameter("assignment_id");
 mode = getUrlParameter("mode");
-participant_id = getUrlParameter("participant_id");
+participant_id = getUrlParameter("participant_id") || "0";
 
 // stop people leaving the page
 window.onbeforeunload = function() {
@@ -86,22 +86,19 @@ create_participant = function() {
             assignment_id + "/" +
             mode;
     }
-
-    if (participant_id === undefined || participant_id === "undefined") {
-        reqwest({
-            url: url,
-            method: "post",
-            type: "json",
-            success: function(resp) {
-                console.log(resp);
-                participant_id = resp.participant.id;
-            },
-            error: function (err) {
-                errorResponse = JSON.parse(err.response);
-                $("body").html(errorResponse.html);
-            }
-        });
-    }
+    reqwest({
+        url: url,
+        method: "post",
+        type: "json",
+        success: function(resp) {
+            console.log(resp);
+            participant_id = resp.participant.id;
+        },
+        error: function (err) {
+            errorResponse = JSON.parse(err.response);
+            $("body").html(errorResponse.html);
+        }
+    });
 };
 
 lock = false;
