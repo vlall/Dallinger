@@ -1,8 +1,6 @@
 [Experiment Configuration]
 mode = deploy
 auto_recruit = true
-network = Empty
-n = 34
 
 [HIT Configuration]
 title = Memory test
@@ -36,4 +34,3 @@ logfile = -
 
 [Shell Parameters]
 launch_in_sandbox_mode = false
-

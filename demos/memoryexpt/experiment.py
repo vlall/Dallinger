@@ -1,10 +1,12 @@
 """Coordination chatroom game."""
 
-import dallinger as dlgr
-from dallinger.nodes import Source
 import json
 import random
+
+import dallinger as dlgr
 from dallinger.models import Node
+from dallinger.networks import Empty
+from dallinger.nodes import Source
 
 
 class CoordinationChatroom(dlgr.experiments.Experiment):
@@ -13,19 +15,9 @@ class CoordinationChatroom(dlgr.experiments.Experiment):
     def __init__(self, session):
         """Initialize the experiment."""
         super(CoordinationChatroom, self).__init__(session)
-        # for running an experiment with individuals three times
-        # (also in config.txt, change to n = 1)
-        #self.experiment_repeats = 4 #1
-        #self.num_participants = dlgr.config.experiment_configuration.n
-        #self.initial_recruitment_size = self.experiment_repeats #self.num_participants*2 #recruit more people than are needed for expt
-        #self.quorum = self.num_participants
-        #self.setup()
-
-        # for normal experiment
-        # (also in config.txt, change to n = whatever)
         self.experiment_repeats = 1
-        self.num_participants = dlgr.config.experiment_configuration.n
-        self.initial_recruitment_size = self.num_participants*3 #self.num_participants*2 #recruit more people than are needed for expt
+        self.num_participants = 4
+        self.initial_recruitment_size = self.num_participants * 3
         self.quorum = self.num_participants
         self.setup()
 
@@ -48,11 +40,7 @@ class CoordinationChatroom(dlgr.experiments.Experiment):
 
     def create_network(self):
         """Create a new network by reading the configuration file."""
-        class_ = getattr(
-            dlgr.networks,
-            dlgr.config.experiment_configuration.network
-        )
-        return class_(max_size=self.num_participants + 1)  # add a Source
+        return Empty(max_size=self.num_participants + 1)  # add a Source
 
     def bonus(self, participant):
         """Give the participant a bonus for waiting."""
@@ -61,7 +49,7 @@ class CoordinationChatroom(dlgr.experiments.Experiment):
         t = participant.end_time - participant.creation_time
 
         # keep to two decimal points otherwise doesn't work
-        return round(t.total_seconds()/3600 * DOLLARS_PER_HOUR, 2)
+        return round((t.total_seconds() / 3600) * DOLLARS_PER_HOUR, 2)
 
     def add_node_to_network(self, node, network):
         """Add node to the chain and receive transmissions."""
@@ -75,7 +63,7 @@ class CoordinationChatroom(dlgr.experiments.Experiment):
 
             # here are all the edges that need to be connected
             # BABY_NETWORK:
-            #all_edges = [(0, 1), (0, 2),(0, 3), (2, 3)]
+            all_edges = [(0, 1), (0, 2), (0, 3), (2, 3)]
 
             # KARATE CLUB:
                 #"""KarateClub network.
@@ -125,7 +113,7 @@ class CoordinationChatroom(dlgr.experiments.Experiment):
             # 3 all_edges = [(0, 1), (0, 2), (0, 33), (1, 33), (1, 2), (1, 3), (2, 3), (2, 4), (2, 5), (3, 4), (3, 5), (4, 5), (4, 6), (5, 7), (6, 8), (6, 9), (6, 7), (7, 8), (7, 9), (8, 9), (8, 10), (9, 32), (10, 32), (10, 11), (10, 12), (11, 12), (11, 13), (12, 17), (12, 14), (13, 14), (13, 15), (14, 16), (14, 15), (15, 16), (15, 17), (16, 17), (16, 18), (17, 18), (17, 19), (18, 19), (18, 20), (19, 20), (19, 21), (20, 21), (20, 22), (21, 32), (21, 23), (22, 24), (22, 23), (23, 24), (23, 25), (24, 25), (24, 26), (25, 26), (25, 27), (26, 27), (26, 28), (27, 28), (27, 29), (28, 29), (28, 30), (29, 30), (29, 31), (30, 32), (30, 31), (31, 32), (31, 33), (32, 33)]
             # 4 all_edges = [(0, 32), (0, 2), (0, 20), (0, 33), (1, 2), (1, 3), (2, 3), (2, 4), (3, 4), (3, 5), (4, 5), (4, 30), (5, 6), (5, 7), (6, 8), (6, 7), (7, 8), (7, 9), (8, 9), (8, 10), (9, 32), (9, 10), (9, 11), (10, 11), (10, 20), (10, 25), (11, 12), (11, 15), (12, 21), (12, 14), (13, 14), (13, 15), (14, 16), (14, 15), (15, 16), (15, 17), (16, 17), (16, 18), (17, 18), (17, 19), (18, 20), (18, 21), (18, 22), (19, 20), (19, 21), (20, 21), (21, 23), (22, 26), (22, 23), (23, 24), (23, 25), (24, 25), (24, 26), (25, 26), (25, 27), (26, 27), (26, 28), (27, 28), (27, 29), (28, 29), (28, 30), (29, 30), (29, 31), (30, 32), (30, 33), (30, 31), (31, 32), (31, 33)]
 
-            all_edges = [(0, 1), (0, 2), (0, 9), (0, 33), (1, 33), (1, 2), (1, 3), (2, 18), (2, 4), (3, 4), (3, 5), (3, 15), (4, 5), (4, 6), (5, 6), (5, 7), (6, 8), (6, 7), (7, 8), (7, 9), (8, 9), (8, 22), (9, 24), (9, 10), (10, 11), (10, 12), (11, 12), (11, 13), (11, 29), (12, 13), (12, 14), (13, 14), (13, 15), (14, 16), (14, 15), (15, 16), (16, 17), (16, 18), (17, 18), (17, 19), (18, 19), (18, 20), (19, 32), (19, 20), (19, 21), (20, 21), (20, 22), (21, 22), (21, 23), (22, 24), (22, 23), (23, 24), (23, 25), (24, 26), (25, 26), (25, 27), (26, 27), (26, 28), (27, 28), (27, 29), (28, 29), (28, 30), (29, 30), (30, 32), (30, 31), (31, 32), (31, 33), (32, 33)]
+            # all_edges = [(0, 1), (0, 2), (0, 9), (0, 33), (1, 33), (1, 2), (1, 3), (2, 18), (2, 4), (3, 4), (3, 5), (3, 15), (4, 5), (4, 6), (5, 6), (5, 7), (6, 8), (6, 7), (7, 8), (7, 9), (8, 9), (8, 22), (9, 24), (9, 10), (10, 11), (10, 12), (11, 12), (11, 13), (11, 29), (12, 13), (12, 14), (13, 14), (13, 15), (14, 16), (14, 15), (15, 16), (16, 17), (16, 18), (17, 18), (17, 19), (18, 19), (18, 20), (19, 32), (19, 20), (19, 21), (20, 21), (20, 22), (21, 22), (21, 23), (22, 24), (22, 23), (23, 24), (23, 25), (24, 26), (25, 26), (25, 27), (26, 27), (26, 28), (27, 28), (27, 29), (28, 29), (28, 30), (29, 30), (30, 32), (30, 31), (31, 32), (31, 33), (32, 33)]
             # 6 all_edges = [(0, 32), (0, 1), (0, 2), (0, 33), (1, 33), (1, 2), (1, 3), (2, 3), (2, 4), (3, 5), (3, 29), (4, 5), (4, 6), (5, 6), (5, 7), (6, 21), (6, 7), (7, 8), (7, 9), (8, 9), (8, 10), (9, 23), (9, 10), (9, 11), (10, 11), (10, 12), (11, 12), (11, 13), (11, 15), (12, 13), (12, 14), (13, 14), (13, 15), (14, 16), (14, 15), (15, 16), (16, 17), (16, 18), (17, 18), (17, 19), (18, 19), (18, 20), (19, 20), (19, 21), (20, 21), (20, 22), (21, 22), (21, 23), (22, 24), (22, 23), (23, 24), (24, 25), (24, 26), (25, 26), (25, 27), (26, 27), (26, 28), (27, 28), (27, 29), (28, 29), (28, 30), (29, 33), (29, 30), (30, 32), (30, 31), (31, 32), (31, 33), (32, 33)]
             # 7 all_edges = [(0, 32), (0, 1), (0, 2), (0, 23), (0, 33), (1, 33), (1, 2), (1, 3), (1, 26), (2, 3), (2, 4), (3, 4), (3, 5), (4, 5), (4, 6), (5, 6), (5, 7), (6, 8), (6, 7), (7, 8), (7, 9), (8, 9), (8, 10), (9, 18), (9, 11), (10, 23), (10, 12), (10, 13), (11, 12), (11, 13), (12, 13), (12, 14), (13, 14), (14, 16), (14, 23), (15, 16), (15, 17), (16, 17), (16, 18), (17, 18), (17, 19), (18, 19), (18, 20), (19, 20), (19, 21), (20, 21), (20, 22), (21, 25), (21, 22), (21, 23), (22, 24), (22, 23), (23, 24), (24, 25), (24, 26), (25, 27), (26, 27), (27, 28), (27, 29), (28, 29), (28, 30), (29, 30), (29, 31), (30, 32), (30, 31), (31, 32), (31, 33), (32, 33)]
             # 8 all_edges = [(0, 32), (0, 2), (0, 7), (0, 33), (1, 33), (1, 2), (1, 3), (2, 3), (2, 4), (3, 5), (3, 31), (4, 5), (4, 6), (5, 6), (5, 7), (6, 16), (6, 7), (7, 23), (7, 8), (7, 10), (8, 9), (8, 10), (9, 10), (9, 11), (10, 11), (10, 12), (11, 12), (11, 13), (12, 13), (12, 14), (13, 14), (13, 15), (14, 16), (14, 15), (15, 16), (15, 17), (16, 17), (16, 18), (17, 18), (17, 19), (18, 19), (18, 27), (19, 20), (19, 21), (20, 30), (20, 21), (20, 22), (21, 22), (21, 23), (22, 24), (22, 23), (23, 25), (24, 25), (24, 26), (25, 26), (25, 27), (26, 27), (26, 28), (27, 28), (27, 29), (28, 29), (28, 30), (29, 30), (29, 31), (30, 32), (31, 32), (31, 33), (32, 33)]
@@ -203,7 +191,7 @@ class FreeRecallListSource(Source):
 
         wordlist = "60words.md" #random.choice(wordlists)
         with open("static/stimuli/{}".format(wordlist), "r") as f:
-            wordlist =  f.read().splitlines()
+            wordlist = f.read().splitlines()
         #    return json.dumps(random.sample(wordlist,60))
             random.shuffle(wordlist)
             return json.dumps(wordlist)
