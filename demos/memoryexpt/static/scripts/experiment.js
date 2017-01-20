@@ -42,7 +42,9 @@ $(document).ready(function() {
 
   // Submit the questionnaire.
   $("#submit-questionnaire").click(function() {
-    submitResponses();
+    if (participant_id > 0) {
+      submitResponses();
+    }
     submitAssignment();
   });
 });
