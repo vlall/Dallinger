@@ -142,7 +142,7 @@ get_transmissions = function() {
     complete: function(err) {
       setTimeout(
         function() {
-          get_transmissions(nodeId);
+          get_transmissions();
         },
         1000
       );
