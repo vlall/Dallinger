@@ -219,49 +219,57 @@ $(document).keypress(function(e) {
   }
 });
 
-// Send participants to the end if there are any infos.
-createParticipant = function() {
+waitIfNeeded = function() {
   reqwest({
     url: "/info",
     method: "get",
     success: function(resp) {
-      if (resp.info.count > 0) {
+      anyInfos = (resp.info.count > 0);
+      createThenWait();
+    }
+  });
+};
+
+createThenWait = function() {
+  // Check if the local store is available, and if so, use it.
+  if (typeof store != "undefined") {
+    url = "/participant/" + store.get("worker_id") + "/" + store.get("hit_id") +
+      "/" +
+      store.get("assignment_id") +
+      "/" +
+      store.get("mode");
+  } else {
+    url = "/participant/" + worker_id + "/" + hit_id + "/" + assignment_id +
+      "/" +
+      mode;
+  }
+  reqwest({
+    url: url,
+    method: "post",
+    type: "json",
+    success: function(resp) {
+      participant_id = resp.participant.id;
+      if (anyInfos) {
         allow_exit();
         go_to_page("questionnaire");
       } else {
-        create_participant();
+        waitForQuorum();
       }
     },
-    error: function(resp) {
-      setTimeout(
-        function() {
-          createParticipant();
-        },
-        1000
-      );
+    error: function(err) {
+      errorResponse = JSON.parse(err.response);
+      $("body").html(errorResponse.html);
     }
   });
 };
 
 quorum = 1000000;
-getQuorum = function() {
-  reqwest({
-    url: "/experiment/quorum",
-    method: "get",
-    success: function(resp) {
-      quorum = resp.quorum;
-    }
-  });
-};
-
 waitForQuorum = function() {
-  // If we haven't gotten the quorum yet, get it.
+  // If we haven't gotten the quorum yet, get it. else if (
   if (quorum >= 1000000 - 1) {
     getQuorum();
-    // If we haven't created a participant yet, hold tight.
-  } else if (participant_id === undefined || participant_id === "undefined") {}
-  // Otherwise, see if we have enough participants to proceed.
-  else {
+    // Otherwise, see if we have enough participants to proceed.
+  } else {
     reqwest({
       url: "/summary",
       method: "get",
@@ -271,7 +279,6 @@ waitForQuorum = function() {
         percent = Math.round(n / quorum * 100) + "%";
         $("#waiting-progress-bar").css("width", percent);
         $("#progress-percentage").text(percent);
-
         if (n >= quorum) {
           allow_exit();
           go_to_page("exp");
@@ -287,6 +294,16 @@ waitForQuorum = function() {
   );
 };
 
+getQuorum = function() {
+  reqwest({
+    url: "/experiment/quorum",
+    method: "get",
+    success: function(resp) {
+      quorum = resp.quorum;
+    }
+  });
+};
+
 numReady = function(summary) {
   for (var i = 0; i < summary.length; i++) {
     if (summary[i][0] == "working") {
@@ -298,24 +315,4 @@ numReady = function(summary) {
 // hack for Dallinger 2.0
 submitResponses = function() {
   submitNextResponse(0);
-};
-
-// Go back to psiTurk.
-submitAssignment = function() {
-  reqwest({
-    url: "/ad_address/" + store.get("mode") + "/" + store.get("hit_id"),
-    method: "get",
-    type: "json",
-    success: function(resp) {
-      allow_exit();
-      window.location = resp.address + "?uniqueId=" + store.get("worker_id") +
-        ":" +
-        store.get("assignment_id");
-    },
-    error: function(err) {
-      console.log(err);
-      errorResponse = JSON.parse(err.response);
-      $("body").html(errorResponse.html);
-    }
-  });
 };
