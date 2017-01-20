@@ -287,8 +287,13 @@ waitForQuorum = function () {
     if (quorum >= (1e6-1)) {
         getQuorum();
 
+    // If we haven't created a participant yet, hold tight.
+    } else if (participant_id === undefined || participant_id === "undefined"){
+        // Do nothing.
+    }
+
     // Otherwise, see if we have enough participants to proceed.
-    } else {
+    else {
         reqwest({
             url: "/summary",
             method: "get",
@@ -323,5 +328,4 @@ numReady = function(summary) {
 // hack for Dallinger 2.0
 submitResponses = function () {
       submitNextResponse(0);
-      //submitAssignment();
-  };
+ };
