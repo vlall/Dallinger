@@ -1,0 +1,6 @@
+id,creation_time,property1,property2,property3,property4,property5,failed,time_of_death,type,network_id,participant_id
+1,2017-01-20 21:50:52.598228,,,,,,f,,free_recall_list_source,1,
+3,2017-01-20 21:53:22.74249,,,,,,f,,agent,1,2
+5,2017-01-20 21:53:23.198935,,,,,,f,,agent,1,1
+4,2017-01-20 21:53:22.756747,,,,,,t,2017-01-20 21:53:26.404114,agent,1,4
+2,2017-01-20 21:53:22.593851,,,,,,t,2017-01-20 21:54:10.216656,agent,1,3
