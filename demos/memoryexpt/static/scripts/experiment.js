@@ -29,20 +29,6 @@ $(document).ready(function() {
         window.location.href = '/waiting';
     });
 
-    // $("#finish-reading").hide();
-    //
-    // // Finish reading the wordList
-    // $("#finish-reading").click(function() {
-    //     // move to chatroom
-    //     $("#stimulus").hide();
-    //     $("#fillertask-form").hide();
-    //     $("#response-form").show();
-    //     $("#send-message").removeClass("disabled");
-    //     $("#send-message").html("Send");
-    //     $("#reproduction").focus();
-    //     get_transmissions(my_node_id);
-    // });
-
     // Send a message.
     $("#send-message").click(function() {
         send_message();
