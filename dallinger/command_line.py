@@ -20,8 +20,9 @@ import tempfile
 import time
 import uuid
 import webbrowser
+import xml.etree.ElementTree as ET
 
-from boto.mturk.connection import MTurkConnection
+from boto.mturk.connection import MTurkConnection, MTurkRequestError
 import click
 from dallinger.config import get_config
 import psycopg2
@@ -157,6 +158,36 @@ def setup_experiment(debug=True, verbose=False, app=None, exp_config=None):
     # Change directory to the temporary folder.
     cwd = os.getcwd()
     os.chdir(dst)
+
+    # temp
+    conn = MTurkConnection(
+        config.get('aws_access_key_id'),
+        config.get('aws_secret_access_key'),
+    )
+
+    try:
+        group_name = config.get('group_name')
+    # if you don't specify a group then the group is an experiment
+    except KeyError:
+        group_name = public_id
+        config.extend({"group_name": public_id})
+
+    try:
+        results = conn.create_qualification_type(
+            group_name,
+            "Participated in group {}".format(group_name),
+            "Active")
+        qualification_type_id = results[0].QualificationTypeId
+    except MTurkRequestError as e:
+        # assume the reason why you're getting the error is you're using a group name
+        # and there's already a qualification_type_id associated with that group name
+        # (i.e. go find the group name qualification id and use that)
+        root = ET.fromstring(e.body)
+        data = root.findall("./QualificationType/Request/Errors/Error/Data")
+        qualification_type_id = data[0].findall("Value")[0].text
+
+    config.extend({"qualification_type_id": qualification_type_id})
+    # temp
 
     # Write the custom config
     if exp_config:
@@ -333,12 +364,27 @@ def deploy_sandbox_shared_setup(verbose=True, app=None, web_procs=1, exp_config=
         config.get('aws_secret_access_key'),
     )
 
-    results = conn.create_qualification_type(
-        id,
-        "Participated in experiment {}".format(id),
-        "Active",
-    )
-    qualification_type_id = results[0].QualificationTypeId
+    try:
+        group_name = config.get('group_name'),
+    # if you don't specify a group then the group is an experiment
+    except KeyError:
+        group_name = id
+        config.extend({"group_name": id})
+
+    try:
+        results = conn.create_qualification_type(
+            group_name,
+            "Participated in group {}".format(group_name),
+            "Active")
+        qualification_type_id = results[0].QualificationTypeId
+    except MTurkRequestError as e:
+        # assume the reason why you're getting the error is you're using a group name
+        # and there's already a qualification_type_id associated with that group name
+        # (i.e. go find the group name qualification id and use that)
+        root = ET.fromstring(e.body)
+        data = root.findall("./QualificationType/Request/Errors/Error/Data")
+        qualification_type_id = data[0].findall("Value")[0].text
+
     config.extend({"qualification_type_id": qualification_type_id})
 
     # Log in to Heroku if we aren't already.
