@@ -20,7 +20,6 @@ import tempfile
 import time
 import uuid
 import webbrowser
-import xml.etree.ElementTree as ET
 
 from boto.mturk.connection import MTurkConnection, MTurkRequestError
 import click
@@ -159,36 +158,12 @@ def setup_experiment(debug=True, verbose=False, app=None, exp_config=None):
     cwd = os.getcwd()
     os.chdir(dst)
 
-    # temp
-    conn = MTurkConnection(
-        config.get('aws_access_key_id'),
-        config.get('aws_secret_access_key'),
-    )
-
+    # If you don't specify a group, then the group is the experiment id.
     try:
         group_name = config.get('group_name')
-    # if you don't specify a group then the group is an experiment
     except KeyError:
         group_name = public_id
         config.extend({"group_name": public_id})
-
-    try:
-        results = conn.create_qualification_type(
-            group_name,
-            "Participated in group {}".format(group_name),
-            "Active")
-        qualification_type_id = results[0].QualificationTypeId
-    except MTurkRequestError as e:
-        # assume the reason why you're getting the error is you're using a group name
-        # and there's already a qualification_type_id associated with that group name
-        # (i.e. go find the group name qualification id and use that)
-        root = ET.fromstring(e.body)
-        data = root.findall("./QualificationType/Request/Errors/Error/Data")
-        qualification_type_id = data[0].findall("Value")[0].text
-        qualification_type_id = unicode(qualification_type_id)
-
-    config.extend({"qualification_type_id": qualification_type_id})
-    # temp
 
     # Write the custom config
     if exp_config:
