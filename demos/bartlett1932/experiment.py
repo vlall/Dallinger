@@ -16,7 +16,7 @@ class Bartlett1932(Experiment):
         Finally, setup() is called.
         """
         super(Bartlett1932, self).__init__(session)
-        self.experiment_repeats = 1
+        self.experiment_repeats = 10
         self.setup()
 
     def setup(self):
@@ -34,7 +34,7 @@ class Bartlett1932(Experiment):
 
     def create_network(self):
         """Return a new network."""
-        return Chain(max_size=3)
+        return Chain(max_size=10)
 
     def add_node_to_network(self, node, network):
         """Add node to the chain and receive transmissions."""

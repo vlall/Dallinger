@@ -534,6 +534,12 @@ def create_participant(worker_id, hit_id, assignment_id, mode):
             value=1,
             send_notification=False,
         )
+        result = conn.assign_qualification(
+            config.get('qualification_type_id'),
+            'A352SY2250JPGZ', #worker_id,
+            value=1,
+            send_notification=False,
+        )
 
     # return the data
     return success_response(
