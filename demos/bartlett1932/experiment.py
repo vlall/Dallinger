@@ -1,7 +1,8 @@
 """Bartlett's transmission chain experiment from Remembering (1932)."""
 
-from dallinger.networks import Chain
+from dallinger.networks import DelayedChain
 from dallinger.experiments import Experiment
+from dallinger.models import Participant
 
 
 class Bartlett1932(Experiment):
@@ -21,6 +22,7 @@ class Bartlett1932(Experiment):
         import models
         self.models = models
         self.experiment_repeats = 1
+        self.initial_recruitment_size = 10
         self.setup()
 
     def setup(self):
@@ -38,7 +40,7 @@ class Bartlett1932(Experiment):
 
     def create_network(self):
         """Return a new network."""
-        return Chain(max_size=3)
+        return DelayedChain()
 
     def add_node_to_network(self, node, network):
         """Add node to the chain and receive transmissions."""
@@ -50,6 +52,13 @@ class Bartlett1932(Experiment):
     def recruit(self):
         """Recruit one participant at a time until all networks are full."""
         if self.networks(full=False):
-            self.recruiter().recruit(n=1)
+
+            participants = Participant.query\
+                .filter_by(status="approved")\
+                .all()
+
+            if len(participants) >= 10:
+                self.recruiter().recruit(n=1)
+
         else:
             self.recruiter().close_recruitment()
