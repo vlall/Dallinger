@@ -727,9 +727,7 @@ def logs(app):
     if app is None:
         raise TypeError("Select an experiment using the --app flag.")
     else:
-        subprocess.check_call([
-            "heroku", "addons:open", "papertrail", "--app", app_name(app)
-        ])
+        heroku.open_logs(app)
 
 
 @dallinger.command()
