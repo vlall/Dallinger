@@ -687,6 +687,7 @@ def verify():
     verify_package(verbose=True)
 
 def verify_id(app):
+    """Verify the experiment id."""
     if app is None:
         raise TypeError("Select an experiment using the --app flag.")
     elif "dlgr-" in app:
