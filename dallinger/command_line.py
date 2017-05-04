@@ -678,7 +678,7 @@ def logs(app):
             "heroku", "addons:open", "papertrail", "--app", app_name(app)
         ])
     except subprocess.CalledProcessError as e:
-        print('Invalid experiment ID. {}'.format(e))
+        print("Invalid experiment ID. {}".format(e))
 
 
 @dallinger.command()
@@ -689,8 +689,8 @@ def verify():
 def verify_id(app):
     if app is None:
         raise TypeError("Select an experiment using the --app flag.")
-    elif 'dlgr-' in app:
-        raise ValueError('Remove the \"dlgr-\" prefix.')
+    elif "dlgr-" in app:
+        raise ValueError("Remove the \"dlgr-\" prefix.")
 
 def verify_package(verbose=True):
     """Ensure the package has a config file and a valid experiment file."""
